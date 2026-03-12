@@ -7,14 +7,13 @@
     "url": "https://remotolist.com"
   },
   "license": "MIT",
-  "homepage": "https://github.com/remotolist/remotolist/tree/main/packages/remotolist-mcp",
+  "homepage": "https://github.com/roylans/remotolist-mcp",
   "repository": {
     "type": "git",
-    "url": "https://github.com/remotolist/remotolist",
-    "directory": "packages/remotolist-mcp"
+    "url": "https://github.com/roylans/remotolist-mcp.git"
   },
   "bugs": {
-    "url": "https://github.com/remotolist/remotolist/issues"
+    "url": "https://github.com/roylans/remotolist-mcp/issues"
   },
   "type": "module",
   "bin": {
@@ -68,6 +67,10 @@
   "devDependencies": {
     "@types/node": "^22.0.0",
     "@types/uuid": "^10.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.0.0",
+    "prettier": "^3.0.0",
     "typescript": "^5.8.2"
   },
   "engines": {

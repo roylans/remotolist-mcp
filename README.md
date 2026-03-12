@@ -1,5 +1,10 @@
 # remotolist-mcp
 
+[![npm version](https://img.shields.io/npm/v/remotolist-mcp.svg)](https://www.npmjs.com/package/remotolist-mcp)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
+
 AI-powered semantic search for candidates. Use Claude Desktop to find tech talent with natural language queries.
 
 **⚡ Quick Start (one command):**
@@ -9,6 +14,33 @@ npx remotolist-mcp setup
 ```
 
 Follow the interactive wizard and you're done!
+
+## Table of Contents
+
+- [What is This?](#what-is-this)
+- [Features](#features)
+- [Installation & Setup](#installation--setup)
+  - [Prerequisites](#prerequisites)
+  - [Easy Setup (Recommended)](#easy-setup-recommended)
+  - [Manual Setup (Alternative)](#manual-setup-alternative)
+- [Usage](#usage)
+  - [Available Tools](#available-tools)
+- [CLI Commands](#cli-commands)
+- [Configuration](#configuration)
+  - [Configuration Locations](#configuration-locations)
+- [Telemetry](#telemetry)
+- [Troubleshooting](#troubleshooting)
+- [Development & Local Testing](#development--local-testing)
+  - [Using Local Development Server](#using-local-development-server)
+  - [Project Structure](#project-structure)
+  - [Building from Source](#building-from-source)
+- [How It Works](#how-it-works)
+- [API Key Security](#api-key-security)
+- [Contributing](#contributing)
+- [Code of Conduct](#code-of-conduct)
+- [Support](#support)
+- [License](#license)
+- [Changelog](#changelog)
 
 ---
 
@@ -266,8 +298,8 @@ src/
 
 ```bash
 # Clone the repository
-git clone https://github.com/remotolist/remotolist.git
-cd packages/remotolist-mcp
+git clone https://github.com/roylans/remotolist-mcp.git
+cd remotolist-mcp
 
 # Install dependencies
 npm install
@@ -322,10 +354,70 @@ This architecture ensures:
 
 ---
 
+## Contributing
+
+We welcome contributions! Here's how you can help:
+
+### Reporting Issues
+- Check if the issue already exists in the [GitHub Issues](https://github.com/roylans/remotolist-mcp/issues)
+- Provide detailed information: OS, Node.js version, error messages, steps to reproduce
+
+### Feature Requests
+- Open an issue with the "enhancement" label
+- Describe the use case and expected behavior
+
+### Pull Requests
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Make your changes
+4. Run tests: `npm test`
+5. Ensure code quality: `npm run lint`
+6. Commit with descriptive messages
+7. Push to your fork
+8. Open a Pull Request
+
+### Development Setup
+```bash
+# Clone and install
+git clone https://github.com/roylans/remotolist-mcp.git
+cd remotolist-mcp
+npm install
+
+# Build
+npm run build
+
+# Run tests
+npm test
+
+# Lint code
+npm run lint
+```
+
+### Code Style
+- Use TypeScript with strict mode
+- Follow existing code patterns
+- Add tests for new features
+- Update documentation
+- Keep commits focused and atomic
+
+## Code of Conduct
+
+### Our Pledge
+We pledge to make participation in our project a harassment-free experience for everyone.
+
+### Our Standards
+- Using welcoming and inclusive language
+- Being respectful of differing viewpoints
+- Gracefully accepting constructive criticism
+- Focusing on what is best for the community
+
+### Enforcement
+Instances of abusive behavior may be reported to the project maintainers. All complaints will be reviewed and investigated.
+
 ## Support
 
 - 📖 **Documentation**: https://docs.remotolist.com/mcp
-- 🐛 **Report bugs**: https://github.com/remotolist/remotolist/issues
+- 🐛 **Report bugs**: https://github.com/roylans/remotolist-mcp/issues
 - 💬 **Discord**: https://discord.gg/remotolist
 - 📧 **Email**: support@remotolist.com
 
@@ -333,7 +425,7 @@ This architecture ensures:
 
 ## License
 
-MIT License © 2025 RemotoList. See LICENSE file.
+MIT License © 2025 RemotoList. See [LICENSE](LICENSE) file for details.
 
 ---
 
