@@ -1,6 +1,6 @@
 {
   "name": "remotolist-mcp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "MCP client for RemotoList AI candidate search. Connect Claude Desktop to search candidates with natural language.",
   "author": {
     "name": "RemotoList",
@@ -44,7 +44,8 @@
     "prepare": "npm run build",
     "watch": "tsc --watch",
     "start": "node dist/index.js",
-    "test": "node --test",
+    "test": "echo \"No tests yet - run 'npm run test:setup' for manual testing\" && exit 0",
+    "test:setup": "node test-setup.cjs",
     "lint": "eslint src --ext .ts",
     "format": "prettier --write src"
   },
@@ -65,13 +66,13 @@
     "uuid": "^10.0.0"
   },
   "devDependencies": {
-    "@types/node": "^22.0.0",
+    "@types/node": "^20.0.0",
     "@types/uuid": "^10.0.0",
-    "@typescript-eslint/eslint-plugin": "^8.0.0",
-    "@typescript-eslint/parser": "^8.0.0",
-    "eslint": "^9.0.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.0.0",
     "prettier": "^3.0.0",
-    "typescript": "^5.8.2"
+    "typescript": "^5.0.0"
   },
   "engines": {
     "node": ">=18.0.0"

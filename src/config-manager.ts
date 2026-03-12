@@ -103,7 +103,7 @@ export class ConfigManager {
       const mergedConfig: Config = {
         apiKey: config.apiKey || existingConfig.apiKey || '',
         sseUrl: config.sseUrl || existingConfig.sseUrl || 'https://api.remotolist.com/mcp/sse/',
-        version: config.version || existingConfig.version || '1.0.0',
+        version: config.version || existingConfig.version || '1.0.1',
         installationId: config.installationId || existingConfig.installationId || uuidv4(),
         createdAt: config.createdAt || existingConfig.createdAt || now,
         lastUpdated: now,

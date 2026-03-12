@@ -51,7 +51,7 @@ export async function validateApiKey(apiKey: string): Promise<ValidationResult> 
     });
 
     if (response.ok) {
-      const result = await response.json() as any;
+      const result = await response.json() as { valid?: boolean; plan?: string; message?: string };
       return {
         valid: result.valid === true,
         plan: result.plan || 'unknown',
@@ -148,7 +148,10 @@ export async function getApiKeyInfo(apiKey: string): Promise<{
     });
 
     if (response.ok) {
-      return await response.json() as any;
+      const result = await response.json() as { valid?: boolean };
+      return {
+        valid: result.valid === true
+      };
     } else {
       return {
         valid: false

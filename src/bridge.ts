@@ -52,47 +52,50 @@ export async function connectBridge(config: BridgeConfig): Promise<void> {
       terminal: false,
     });
 
-      rl.on('line', async (line) => {
-        if (!line.trim()) return;
+      rl.on('line', (line) => {
+        void (async () => {
+          if (!line.trim()) return;
 
-        // Wait for handshake to complete
-        if (!postUrl) {
-          console.error('[RemotoList MCP] Waiting for endpoint URL before sending message...');
-          return;
-        }
-
-        try {
-          await fetch(postUrl, {
-            method: 'POST',
-            headers: {
-              ...headers,
-              'Content-Type': 'application/json',
-            },
-            body: line,
-          });
-          
-          // Track search events (anonymous)
-          try {
-            const message = JSON.parse(line);
-            if (message.method === 'tools/call' && message.params?.name === 'search_candidates') {
-              await trackEvent(TelemetryEvents.SEARCH, {
-                tool: 'search_candidates'
-                // Note: We don't track the actual query content
-              });
-            }
-          } catch {
-            // Ignore parsing errors
+          // Wait for handshake to complete
+          if (!postUrl) {
+            console.error('[RemotoList MCP] Waiting for endpoint URL before sending message...');
+            return;
           }
-        } catch (error) {
-          console.error(`[RemotoList MCP] Error forwarding message to POST endpoint: ${error}`);
-        }
+
+          try {
+            await fetch(postUrl, {
+              method: 'POST',
+              headers: {
+                ...headers,
+                'Content-Type': 'application/json',
+              },
+              body: line,
+            });
+            
+            // Track search events (anonymous)
+            try {
+              const message = JSON.parse(line);
+              if (message.method === 'tools/call' && message.params?.name === 'search_candidates') {
+                await trackEvent(TelemetryEvents.SEARCH, {
+                  tool: 'search_candidates'
+                  // Note: We don't track the actual query content
+                });
+              }
+            } catch {
+              // Ignore parsing errors
+            }
+          } catch (error) {
+            console.error(`[RemotoList MCP] Error forwarding message to POST endpoint: ${error}`);
+          }
+        })();
       });
 
     // 2. Process SSE stream (Server -> Claude)
-    const stream = response.body as any;
+    const stream = response.body as NodeJS.ReadableStream;
     
     for await (const chunk of stream) {
-      buffer += decoder.decode(chunk, { stream: true });
+      const chunkBuffer = typeof chunk === 'string' ? Buffer.from(chunk) : chunk;
+      buffer += decoder.decode(chunkBuffer, { stream: true });
 
       while (buffer.includes('\n\n')) {
         const [block, rest] = buffer.split('\n\n', 2);

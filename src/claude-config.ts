@@ -19,7 +19,7 @@ export interface ClaudeConfig {
       env?: Record<string, string>;
     };
   };
-  preferences?: Record<string, any>;
+  preferences?: Record<string, unknown>;
 }
 
 export class ClaudeConfigManager {

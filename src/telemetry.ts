@@ -17,7 +17,7 @@ export interface TelemetryEvent {
   os: string;
   osVersion: string;
   timestamp: string;
-  data?: Record<string, any>;
+  data?: Record<string, unknown>;
 }
 
 export class Telemetry {
@@ -57,7 +57,7 @@ export class Telemetry {
   /**
    * Track an event
    */
-  async trackEvent(event: string, data?: Record<string, any>): Promise<void> {
+  async trackEvent(event: string, data?: Record<string, unknown>): Promise<void> {
     if (!this.enabled) {
       return;
     }
@@ -65,7 +65,7 @@ export class Telemetry {
     try {
       // Get installation ID from config
       let installationId = 'unknown';
-      let version = '1.0.0';
+      let version = '1.0.1';
       
       try {
         const config = await this.configManager.load();
@@ -132,7 +132,9 @@ export class Telemetry {
       
       // If there are more events, send them
       if (this.queue.length > 0) {
-        setTimeout(() => this.sendQueue(), 1000);
+        setTimeout(() => {
+          void this.sendQueue();
+        }, 1000);
       }
     }
   }
@@ -161,7 +163,7 @@ const telemetry = new Telemetry();
 /**
  * Track an event (convenience function)
  */
-export async function trackEvent(event: string, data?: Record<string, any>): Promise<void> {
+export async function trackEvent(event: string, data?: Record<string, unknown>): Promise<void> {
   return telemetry.trackEvent(event, data);
 }
 
