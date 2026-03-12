@@ -1,0 +1,76 @@
+{
+  "name": "remotolist-mcp",
+  "version": "1.0.0",
+  "description": "MCP client for RemotoList AI candidate search. Connect Claude Desktop to search candidates with natural language.",
+  "author": {
+    "name": "RemotoList",
+    "url": "https://remotolist.com"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/remotolist/remotolist/tree/main/packages/remotolist-mcp",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/remotolist/remotolist",
+    "directory": "packages/remotolist-mcp"
+  },
+  "bugs": {
+    "url": "https://github.com/remotolist/remotolist/issues"
+  },
+  "type": "module",
+  "bin": {
+    "remotolist-mcp": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./bridge": {
+      "import": "./dist/bridge.js",
+      "types": "./dist/bridge.d.ts"
+    },
+    "./config": {
+      "import": "./dist/config.js",
+      "types": "./dist/config.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc && chmod +x dist/index.js",
+    "prepare": "npm run build",
+    "watch": "tsc --watch",
+    "start": "node dist/index.js",
+    "test": "node --test",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write src"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "claude",
+    "claude-desktop",
+    "ai",
+    "recruiting",
+    "talent-search",
+    "semantic-search",
+    "remotolist",
+    "sse"
+  ],
+  "dependencies": {
+    "node-fetch": "^3.3.2",
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/uuid": "^10.0.0",
+    "typescript": "^5.8.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
