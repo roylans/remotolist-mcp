@@ -142,11 +142,25 @@ Claude: I'll search for Python developers with Django experience for you...
 
 - **`search_candidates`** - Search candidates with natural language queries
   - Example: "Find Python developers with 3+ years experience"
-  - Returns: Matching candidates with scores and details
+  - Returns: Matching candidates with username, skills, timezone, salary expectations, availability
 
 - **`get_candidate_profile`** - Get detailed information about a specific candidate
   - Example: "Show me the full profile for candidate 123"
-  - Returns: Complete CV, skills, experience, availability, etc.
+  - Returns: Complete professional profile with experience, education, projects, languages, etc.
+
+- **`get_candidate_profile_url`** - Get direct link to candidate's public profile
+  - Example: "Give me the profile URL for candidate 123"
+  - Returns: Direct link to https://remotolist.com/@username
+
+### Privacy & GDPR Compliance
+
+✅ **This tool is fully GDPR-compliant:**
+
+- Only searches **public profiles** (candidates who opted in)
+- Uses **professional identifiers** (@username) instead of real names
+- **Never** exposes personal data (emails, contact info, photos)
+- **Only public information** is shared with AI services
+- Candidates can **opt-out instantly** by making their profile private
 
 ---
 
