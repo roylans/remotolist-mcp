@@ -62,7 +62,7 @@ remotolist-mcp --version
 ```json
 {
   "apiKey": "cj_mcp_...",
-  "sseUrl": "https://api.remotolist.com/mcp/sse/",
+  "sseUrl": "https://remotolist.com/mcp/sse/",
   "version": "1.0.0",
   "installationId": "...",
   "createdAt": "...",

@@ -63,7 +63,7 @@ Claude will search through the RemotoList database using natural language unders
 - **🤖 AI-Powered Search**: Natural language queries for candidates
 - **⚡ Easy Setup**: Interactive wizard, no environment variables needed
 - **🔒 Secure**: API keys stored locally with proper permissions
-- **🔄 Flexible**: Works with production (`api.remotolist.com`) or local development
+- **🔄 Flexible**: Works with production (`remotolist.com`) or local development
 - **📊 Telemetry**: Anonymous usage tracking (opt-in) to help improve
 - **🔧 CLI Tools**: Commands for testing, diagnostics, and management
 
@@ -118,7 +118,7 @@ If you prefer manual setup:
 
 4. **Follow the prompts**:
    - Enter your API key
-   - Choose SSE URL (default: `https://api.remotolist.com/mcp/sse/`)
+   - Choose SSE URL (default: `https://remotolist.com/mcp/sse/`)
    - The wizard configures Claude Desktop automatically
 
 5. **Restart Claude Desktop**
@@ -204,7 +204,7 @@ Configuration is stored in `~/.remotolist/config.json`:
 ```json
 {
   "apiKey": "cj_mcp_...",
-  "sseUrl": "https://api.remotolist.com/mcp/sse/",
+  "sseUrl": "https://remotolist.com/mcp/sse/",
   "version": "1.0.0",
   "installationId": "uuid-v4",
   "createdAt": "2025-03-12T10:30:00Z",

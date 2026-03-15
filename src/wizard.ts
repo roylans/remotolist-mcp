@@ -174,7 +174,7 @@ export class SetupWizard {
     console.log('Enter the SSE endpoint URL for RemotoList MCP.');
     console.log('');
     console.log('Common options:');
-    console.log('• Production: https://api.remotolist.com/mcp/sse/');
+    console.log('• Production: https://remotolist.com/mcp/sse/');
     console.log('• Development: http://localhost:8000/mcp/sse/');
     console.log('• Custom: Your custom endpoint URL');
     console.log('');
@@ -187,7 +187,7 @@ export class SetupWizard {
       
       // Use default if empty
       if (!sseUrl.trim()) {
-        sseUrl = 'https://api.remotolist.com/mcp/sse/';
+        sseUrl = 'https://remotolist.com/mcp/sse/';
       }
 
       // Validate URL format

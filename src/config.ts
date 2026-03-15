@@ -17,7 +17,7 @@ export interface Config {
  * Use ConfigManager from config-manager.ts instead.
  *
  * Required:
- *   - MCP_SSE_URL: URL to the SSE endpoint (e.g., https://api.remotolist.com/mcp/sse/)
+ *   - MCP_SSE_URL: URL to the SSE endpoint (e.g., https://remotolist.com/mcp/sse/)
  *   - X_API_KEY: API key for authentication (e.g., cj_mcp_...)
  *
  * Optional:
@@ -36,7 +36,7 @@ export function loadConfig(): Config {
     console.warn('Run \'remotolist-mcp setup\' for easier configuration.');
     throw new Error(
       'Environment variable MCP_SSE_URL is required. ' +
-      'Set it to your RemotoList SSE endpoint URL (e.g., https://api.remotolist.com/mcp/sse/) ' +
+      'Set it to your RemotoList SSE endpoint URL (e.g., https://remotolist.com/mcp/sse/) ' +
       'or run \'remotolist-mcp setup\' for easier configuration.'
     );
   }
@@ -136,11 +136,11 @@ Old method (environment variables):
 2. Set environment variables:
 
    macOS/Linux:
-   $ export MCP_SSE_URL="https://api.remotolist.com/mcp/sse/"
+   $ export MCP_SSE_URL="https://remotolist.com/mcp/sse/"
    $ export X_API_KEY="cj_mcp_your_key_here"
 
    Add to ~/.zshrc or ~/.bashrc to persist:
-   export MCP_SSE_URL="https://api.remotolist.com/mcp/sse/"
+   export MCP_SSE_URL="https://remotolist.com/mcp/sse/"
    export X_API_KEY="cj_mcp_your_key_here"
 
 3. Add to Claude Desktop config:
@@ -155,7 +155,7 @@ Old method (environment variables):
        "remotolist": {
          "command": "remotolist-mcp",
          "env": {
-           "MCP_SSE_URL": "https://api.remotolist.com/mcp/sse/",
+           "MCP_SSE_URL": "https://remotolist.com/mcp/sse/",
            "X_API_KEY": "cj_mcp_your_key_here"
          }
        }

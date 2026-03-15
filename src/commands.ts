@@ -89,7 +89,7 @@ export class Commands {
   async test(): Promise<void> {
     try {
       const config = await this.configManager.load();
-      
+
       console.log('');
       console.log('🔌 Testing Connection');
       console.log('====================');
@@ -97,7 +97,7 @@ export class Commands {
       console.log(`API Key: ${config.apiKey.substring(0, 10)}...`);
       console.log(`SSE URL: ${config.sseUrl}`);
       console.log('');
-      
+
       // Test API key validation
       console.log('1. Validating API key...');
       const validation = await validateApiKey(config.apiKey);
@@ -106,7 +106,7 @@ export class Commands {
       } else {
         console.log(`   ❌ Invalid: ${validation.message}`);
       }
-      
+
       // Test SSE connection
       console.log('2. Testing SSE connection...');
       const connectionTest = await testConnection(config.apiKey, config.sseUrl);
@@ -115,7 +115,7 @@ export class Commands {
       } else {
         console.log(`   ❌ Connection failed: ${connectionTest.message}`);
       }
-      
+
       console.log('');
       if (validation.valid && connectionTest.valid) {
         console.log('🎉 All tests passed! RemotoList MCP is ready to use.');
@@ -123,7 +123,7 @@ export class Commands {
         console.log('⚠️  Some tests failed. Check your configuration.');
         process.exit(1);
       }
-      
+
     } catch (error) {
       console.error(`❌ Error: ${error instanceof Error ? error.message : String(error)}`);
       console.error('Run \'remotolist-mcp setup\' to configure first.');
@@ -182,7 +182,7 @@ export class Commands {
       try {
         const config = await this.configManager.load();
         const connectionTest = await testConnection(config.apiKey, config.sseUrl);
-        
+
         if (connectionTest.valid) {
           console.log('   ✅ Connection to RemotoList server successful');
         } else {
