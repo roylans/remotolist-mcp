@@ -49,10 +49,11 @@ async function main(): Promise<void> {
 async function handleCommand(args: string[]): Promise<void> {
   const commands = new Commands();
   const command = args[0];
-  
+  const commandArgs = args.slice(1);
+
   switch (command) {
     case 'setup':
-      await commands.setup();
+      await commands.setup(commandArgs);
       break;
       
     case 'config':

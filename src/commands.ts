@@ -30,13 +30,20 @@ export class Commands {
   /**
    * Run setup wizard
    */
-  async setup(): Promise<void> {
+  async setup(args: string[] = []): Promise<void> {
     console.log('🚀 Starting RemotoList MCP setup...');
     await trackEvent(TelemetryEvents.SETUP_START);
-    
-    const wizard = new SetupWizard();
+
+    // Parse flags for development mode
+    const devMode = args.includes('--dev') || args.includes('--local');
+
+    if (devMode) {
+      console.log('🔧 Development mode enabled');
+    }
+
+    const wizard = new SetupWizard({ devMode });
     const success = await wizard.run();
-    
+
     if (success) {
       console.log('✅ Setup completed successfully!');
     } else {
@@ -345,7 +352,8 @@ export class Commands {
     console.log('Usage: remotolist-mcp [command]');
     console.log('');
     console.log('Commands:');
-    console.log('  setup                    Interactive setup wizard');
+    console.log('  setup [--dev|--local]    Interactive setup wizard');
+    console.log('                           Use --dev or --local for localhost development');
     console.log('  config                   Show current configuration');
     console.log('  test                     Test connection to RemotoList');
     console.log('  doctor                   Diagnose and fix issues');

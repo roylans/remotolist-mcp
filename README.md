@@ -90,9 +90,15 @@ remotolist-mcp setup
 
 The interactive wizard will:
 1. Ask for your API key
-2. Configure everything automatically
-3. Set up Claude Desktop
+2. Automatically use production server (`https://remotolist.com/mcp/sse/`)
+3. Configure Claude Desktop automatically
 4. No environment variables needed!
+
+**For development/local testing**, use the `--dev` flag:
+```bash
+npx remotolist-mcp setup --dev
+# This uses: http://localhost:8000/mcp/sse/
+```
 
 ### Manual Setup (Alternative)
 
@@ -118,8 +124,9 @@ If you prefer manual setup:
 
 4. **Follow the prompts**:
    - Enter your API key
-   - Choose SSE URL (default: `https://remotolist.com/mcp/sse/`)
+   - The wizard automatically selects the server URL (production by default)
    - The wizard configures Claude Desktop automatically
+   - (Add `--dev` flag if using local development server)
 
 5. **Restart Claude Desktop**
 
@@ -175,8 +182,12 @@ npm install -g remotolist-mcp
 remotolist-mcp [command]
 
 # Commands:
-# Interactive setup wizard
+# Interactive setup wizard (uses production server)
 npx remotolist-mcp setup
+
+# Setup for local development (uses localhost)
+npx remotolist-mcp setup --dev
+npx remotolist-mcp setup --local
 
 # Show current configuration
 npx remotolist-mcp config
@@ -287,11 +298,16 @@ npx remotolist-mcp doctor
 
 ### Using Local Development Server
 
-During setup, you can use a local development server:
+For local development and testing, use the `--dev` flag during setup:
 
+```bash
+# Setup for local development
+npx remotolist-mcp setup --dev
+
+# This automatically configures to use: http://localhost:8000/mcp/sse/
 ```
-SSE URL: http://localhost:8000/mcp/sse/
-```
+
+**Note**: The `--dev` flag is intended for development team members only. Regular users should use the standard setup without the flag.
 
 ### Project Structure
 

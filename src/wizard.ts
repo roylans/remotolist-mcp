@@ -16,14 +16,16 @@ export class SetupWizard {
   private rl: readline.Interface;
   private configManager: ConfigManager;
   private claudeConfigManager: ClaudeConfigManager;
+  private devMode: boolean;
 
-  constructor() {
+  constructor(options?: { devMode?: boolean }) {
     this.rl = readline.createInterface({
       input: process.stdin,
       output: process.stdout
     });
     this.configManager = new ConfigManager();
     this.claudeConfigManager = new ClaudeConfigManager();
+    this.devMode = options?.devMode ?? false;
   }
 
   /**
@@ -46,8 +48,8 @@ export class SetupWizard {
       // Step 2: Get API key
       const apiKey = await this.getApiKey();
 
-      // Step 3: Get SSE URL
-      const sseUrl = await this.getSseUrl();
+      // Step 3: Determine SSE URL based on mode
+      const sseUrl = this.determineSseUrl();
 
       // Step 4: Validate configuration
       const isValid = await this.validateConfiguration(apiKey, sseUrl);
@@ -164,45 +166,21 @@ export class SetupWizard {
   }
 
   /**
-   * Get SSE URL from user
+   * Determine SSE URL based on mode (development or production)
    */
-  private async getSseUrl(): Promise<string> {
-    console.log('');
-    console.log('🌐 SSE URL Setup');
-    console.log('================');
-    console.log('');
-    console.log('Enter the SSE endpoint URL for RemotoList MCP.');
-    console.log('');
-    console.log('Common options:');
-    console.log('• Production: https://remotolist.com/mcp/sse/');
-    console.log('• Development: http://localhost:8000/mcp/sse/');
-    console.log('• Custom: Your custom endpoint URL');
-    console.log('');
-
-    let sseUrl = '';
-    let isValid = false;
-
-    while (!isValid) {
-      sseUrl = await this.askQuestion('Enter SSE URL (press Enter for default): ');
-      
-      // Use default if empty
-      if (!sseUrl.trim()) {
-        sseUrl = 'https://remotolist.com/mcp/sse/';
-      }
-
-      // Validate URL format
-      const urlValidation = this.configManager.validateSseUrlFormat(sseUrl);
-      if (!urlValidation.valid) {
-        console.log(`❌ ${urlValidation.message}`);
-        console.log('');
-        continue;
-      }
-
-      console.log(`✅ Using SSE URL: ${sseUrl}`);
-      isValid = true;
+  private determineSseUrl(): string {
+    if (this.devMode) {
+      console.log('');
+      console.log('🔧 Development Mode');
+      console.log('Using local development server: http://localhost:8000/mcp/sse/');
+      console.log('');
+      return 'http://localhost:8000/mcp/sse/';
     }
 
-    return sseUrl;
+    console.log('');
+    console.log('🌐 Using production server: https://remotolist.com/mcp/sse/');
+    console.log('');
+    return 'https://remotolist.com/mcp/sse/';
   }
 
   /**
