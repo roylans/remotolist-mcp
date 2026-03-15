@@ -28,7 +28,7 @@ import { Commands } from './commands.js';
 import { ConfigManager } from './config-manager.js';
 import { trackEvent, TelemetryEvents } from './telemetry.js';
 
-const VERSION = '1.0.1';
+const VERSION = '1.0.3';
 
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
