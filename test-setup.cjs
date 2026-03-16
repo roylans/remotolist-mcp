@@ -10,7 +10,7 @@ const readline = require('readline');
 
 // Test API key (invalid for testing)
 const testApiKey = 'cj_mcp_test_key_1234567890';
-const testSseUrl = 'http://localhost:8000/mcp/sse/';
+const testSseUrl = 'http://localhost:8001/mcp/sse/';
 
 console.log('🧪 Testing RemotoList MCP setup wizard...');
 console.log('');

@@ -304,7 +304,7 @@ For local development and testing, use the `--dev` flag during setup:
 # Setup for local development
 npx remotolist-mcp setup --dev
 
-# This automatically configures to use: http://localhost:8000/mcp/sse/
+# This automatically configures to use: http://localhost:8001/mcp/sse/
 ```
 
 **Note**: The `--dev` flag is intended for development team members only. Regular users should use the standard setup without the flag.

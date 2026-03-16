@@ -92,28 +92,44 @@ export async function connectBridge(config: BridgeConfig): Promise<void> {
 
     // 2. Process SSE stream (Server -> Claude)
     const stream = response.body as NodeJS.ReadableStream;
-    
+
     for await (const chunk of stream) {
       const chunkBuffer = typeof chunk === 'string' ? Buffer.from(chunk) : chunk;
-      buffer += decoder.decode(chunkBuffer, { stream: true });
+      const decoded = decoder.decode(chunkBuffer, { stream: true });
+      buffer += decoded;
 
-      while (buffer.includes('\n\n')) {
-        const [block, rest] = buffer.split('\n\n', 2);
+      // Split on both \n\n and \r\n\r\n (handle both LF and CRLF)
+      const separator = buffer.includes('\r\n\r\n') ? '\r\n\r\n' : '\n\n';
+
+      while (buffer.includes(separator)) {
+        const [block, rest] = buffer.split(separator, 2);
         buffer = rest;
 
-        for (const line of block.split('\n')) {
-          if (line.startsWith('data: ')) {
-            const data = line.slice(6);
-            
-            // Handshake: If first data looks like a path, it's the POST endpoint
-            if (!postUrl && data.startsWith('/')) {
-              postUrl = new URL(data, sseUrl).href;
-              console.error(`[RemotoList MCP] Handshake complete. Post URL: ${postUrl}`);
-            } else if (postUrl) {
-              // Forward actual JSON-RPC messages to Claude's stdout
-              process.stdout.write(data + '\n');
-            }
+        // Parse SSE event block (event: type\ndata: content)
+        // Normalize line endings to just \n
+        const lines = block.replace(/\r\n/g, '\n').split('\n').filter(l => l.length > 0);
+
+        let eventType = '';
+        let eventData = '';
+
+        for (const line of lines) {
+          if (line.startsWith('event: ')) {
+            eventType = line.slice(7).trim();
+          } else if (line.startsWith('data: ')) {
+            eventData = line.slice(6).trim();
           }
+        }
+
+        // Handle different event types
+        if (eventType === 'endpoint' && eventData) {
+          // Handshake: server sends the POST endpoint path
+          if (!postUrl) {
+            postUrl = new URL(eventData, sseUrl).href;
+            console.error(`[RemotoList MCP] Handshake complete. Post URL: ${postUrl}`);
+          }
+        } else if (eventType === 'message' && eventData && postUrl) {
+          // Forward MCP JSON-RPC messages to Claude's stdout
+          process.stdout.write(eventData + '\n');
         }
       }
     }
