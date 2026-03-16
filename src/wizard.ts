@@ -172,9 +172,9 @@ export class SetupWizard {
     if (this.devMode) {
       console.log('');
       console.log('🔧 Development Mode');
-      console.log('Using local development server: http://localhost:8001/mcp/sse/');
+      console.log('Using local development server: http://localhost:8000/mcp/sse/');
       console.log('');
-      return 'http://localhost:8001/mcp/sse/';
+      return 'http://localhost:8000/mcp/sse/';
     }
 
     console.log('');
