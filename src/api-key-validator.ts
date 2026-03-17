@@ -23,19 +23,19 @@ export async function validateApiKey(apiKey: string): Promise<ValidationResult> 
 
   // Try to validate with server if we have a URL
   try {
-    // We need to get the SSE URL from config or use default
-    let sseUrl = 'https://remotolist.com/mcp/sse/';
-    
+    // We need to get the API URL from config or use default
+    let apiUrl = 'https://remotolist.com/mcp';
+
     // Try to load existing config to get the URL
     try {
       const config = await configManager.load();
-      sseUrl = config.sseUrl;
+      apiUrl = config.apiUrl;
     } catch {
       // If no config exists, use default
     }
 
     // Extract base URL for validation endpoint
-    const baseUrl = sseUrl.replace('/mcp/sse/', '');
+    const baseUrl = apiUrl.replace('/mcp', '');
     const validationUrl = `${baseUrl}/mcp/validate-key/`;
     
     console.log(`🔍 Validating API key against: ${baseUrl}`);
@@ -78,36 +78,40 @@ export async function validateApiKey(apiKey: string): Promise<ValidationResult> 
 }
 
 /**
- * Test connection to SSE endpoint
- * For SSE streams, we only need to verify the connection opens successfully,
- * we don't need to wait for the stream to complete (which would be infinite).
+ * Test connection to API endpoint
+ * For Streamable HTTP, we test a single POST request to verify the connection works.
  */
-export async function testConnection(apiKey: string, sseUrl: string): Promise<ValidationResult> {
+export async function testConnection(apiKey: string, apiUrl: string): Promise<ValidationResult> {
   try {
-    console.log(`🔍 Testing connection to: ${sseUrl}`);
+    console.log(`🔍 Testing connection to: ${apiUrl}`);
 
     // Create a separate controller for the response check
     const responseController = new AbortController();
-    // Set a longer timeout (30s) for establishing the connection
+    // Set a timeout (10s) for the connection
     const responseTimeout = setTimeout(() => {
       console.log('⏱️  Connection test timeout reached, aborting...');
       responseController.abort();
-    }, 30000);
+    }, 10000);
 
     try {
-      const response = await fetch(sseUrl, {
-        method: 'GET',
+      // Send a simple tools/list request to test the connection
+      const response = await fetch(apiUrl, {
+        method: 'POST',
         headers: {
           'X-API-Key': apiKey,
-          'Accept': 'text/event-stream'
+          'Content-Type': 'application/json'
         },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'tools/list',
+          params: {}
+        }),
         signal: responseController.signal
       });
 
       clearTimeout(responseTimeout);
 
-      // For SSE, the stream is infinite, so we just check that we got a response
-      // No need to read/close the body since the request will be abandoned
       if (response.ok) {
         return {
           valid: true,
@@ -154,18 +158,18 @@ export async function getApiKeyInfo(apiKey: string): Promise<{
 }> {
   try {
     const configManager = new ConfigManager();
-    
+
     // Try to load config to get URL
-    let sseUrl = 'https://remotolist.com/mcp/sse/';
+    let apiUrl = 'https://remotolist.com/mcp';
     try {
       const config = await configManager.load();
-      sseUrl = config.sseUrl;
+      apiUrl = config.apiUrl;
     } catch {
       // Use default
     }
 
     // Extract base URL
-    const baseUrl = sseUrl.replace('/mcp/sse/', '');
+    const baseUrl = apiUrl.replace('/mcp', '');
     const infoUrl = `${baseUrl}/mcp/key-info/`;
     
     const response = await fetch(infoUrl, {

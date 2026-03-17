@@ -14,7 +14,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 export interface Config {
   apiKey: string;
-  sseUrl: string;
+  apiUrl: string;
   version: string;
   installationId: string;
   createdAt: string;
@@ -102,7 +102,7 @@ export class ConfigManager {
       const now = new Date().toISOString();
       const mergedConfig: Config = {
         apiKey: config.apiKey || existingConfig.apiKey || '',
-        sseUrl: config.sseUrl || existingConfig.sseUrl || 'https://remotolist.com/mcp/sse/',
+        apiUrl: config.apiUrl || existingConfig.apiUrl || 'https://remotolist.com/mcp',
         version: config.version || existingConfig.version || '1.0.1',
         installationId: config.installationId || existingConfig.installationId || uuidv4(),
         createdAt: config.createdAt || existingConfig.createdAt || now,
@@ -115,8 +115,8 @@ export class ConfigManager {
         throw new Error('API key is required');
       }
 
-      if (!mergedConfig.sseUrl) {
-        throw new Error('SSE URL is required');
+      if (!mergedConfig.apiUrl) {
+        throw new Error('API URL is required');
       }
 
       // Save config
@@ -223,24 +223,24 @@ export class ConfigManager {
   }
 
   /**
-   * Validate SSE URL format
+   * Validate API URL format
    */
-  validateSseUrlFormat(sseUrl: string): ValidationResult {
-    if (!sseUrl) {
-      return { valid: false, message: 'SSE URL is required' };
+  validateApiUrlFormat(apiUrl: string): ValidationResult {
+    if (!apiUrl) {
+      return { valid: false, message: 'API URL is required' };
     }
 
     try {
-      const url = new URL(sseUrl);
-      
+      const url = new URL(apiUrl);
+
       // Check if it's a valid HTTP/HTTPS URL
       if (!['http:', 'https:'].includes(url.protocol)) {
-        return { valid: false, message: 'SSE URL must be http:// or https://' };
+        return { valid: false, message: 'API URL must be http:// or https://' };
       }
 
       return { valid: true };
     } catch {
-      return { valid: false, message: 'SSE URL is not a valid URL' };
+      return { valid: false, message: 'API URL is not a valid URL' };
     }
   }
 }

@@ -48,18 +48,18 @@ export class SetupWizard {
       // Step 2: Get API key
       const apiKey = await this.getApiKey();
 
-      // Step 3: Determine SSE URL based on mode
-      const sseUrl = this.determineSseUrl();
+      // Step 3: Determine API URL based on mode
+      const apiUrl = this.determineApiUrl();
 
       // Step 4: Validate configuration
-      const isValid = await this.validateConfiguration(apiKey, sseUrl);
+      const isValid = await this.validateConfiguration(apiKey, apiUrl);
       if (!isValid) {
         console.log('❌ Configuration validation failed. Please check your settings.');
         return false;
       }
 
       // Step 5: Save configuration
-      await this.saveConfiguration(apiKey, sseUrl);
+      await this.saveConfiguration(apiKey, apiUrl);
 
       // Step 6: Configure Claude Desktop
       const claudeConfigured = await this.configureClaudeDesktop();
@@ -166,30 +166,30 @@ export class SetupWizard {
   }
 
   /**
-   * Determine SSE URL based on mode (development or production)
+   * Determine API URL based on mode (development or production)
    */
-  private determineSseUrl(): string {
+  private determineApiUrl(): string {
     if (this.devMode) {
       console.log('');
       console.log('🔧 Development Mode');
-      console.log('Using local development server: http://localhost:8000/mcp/sse/');
+      console.log('Using local development server: http://localhost:8000/mcp');
       console.log('');
-      return 'http://localhost:8000/mcp/sse/';
+      return 'http://localhost:8000/mcp';
     }
 
     console.log('');
-    console.log('🌐 Using production server: https://remotolist.com/mcp/sse/');
+    console.log('🌐 Using production server: https://remotolist.com/mcp');
     console.log('');
-    return 'https://remotolist.com/mcp/sse/';
+    return 'https://remotolist.com/mcp';
   }
 
   /**
    * Validate configuration
    */
-  private async validateConfiguration(apiKey: string, sseUrl: string): Promise<boolean> {
+  private async validateConfiguration(apiKey: string, apiUrl: string): Promise<boolean> {
     console.log('');
     console.log('🔧 Validating configuration...');
-    
+
     // Validate API key format
     const apiKeyValidation = this.configManager.validateApiKeyFormat(apiKey);
     if (!apiKeyValidation.valid) {
@@ -197,10 +197,10 @@ export class SetupWizard {
       return false;
     }
 
-    // Validate SSE URL format
-    const urlValidation = this.configManager.validateSseUrlFormat(sseUrl);
+    // Validate API URL format
+    const urlValidation = this.configManager.validateApiUrlFormat(apiUrl);
     if (!urlValidation.valid) {
-      console.log(`❌ SSE URL validation failed: ${urlValidation.message}`);
+      console.log(`❌ API URL validation failed: ${urlValidation.message}`);
       return false;
     }
 
@@ -211,16 +211,16 @@ export class SetupWizard {
   /**
    * Save configuration to file
    */
-  private async saveConfiguration(apiKey: string, sseUrl: string): Promise<void> {
+  private async saveConfiguration(apiKey: string, apiUrl: string): Promise<void> {
     console.log('');
     console.log('💾 Saving configuration...');
-    
+
     try {
       await this.configManager.save({
         apiKey,
-        sseUrl
+        apiUrl
       });
-      
+
       console.log(`✅ Configuration saved to: ${this.configManager.getConfigPath()}`);
     } catch (error) {
       console.error(`❌ Failed to save configuration: ${error instanceof Error ? error.message : String(error)}`);

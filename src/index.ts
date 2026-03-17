@@ -110,16 +110,16 @@ async function startBridgeOrSetup(): Promise<void> {
     const config = await configManager.load();
     
     console.error(`[RemotoList MCP] v${VERSION}`);
-    console.error(`[RemotoList MCP] Starting bridge to ${config.sseUrl}...`);
-    
+    console.error(`[RemotoList MCP] Starting bridge to ${config.apiUrl}...`);
+
     // Track bridge start
     await trackEvent(TelemetryEvents.BRIDGE_START, {
-      sseUrl: config.sseUrl
+      apiUrl: config.apiUrl
     });
-    
+
     // Start the bridge
     await connectBridge({
-      sseUrl: config.sseUrl,
+      apiUrl: config.apiUrl,
       apiKey: config.apiKey
     });
     

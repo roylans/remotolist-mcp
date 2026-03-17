@@ -67,7 +67,7 @@ export class Commands {
       console.log('');
       console.log('Settings:');
       console.log(`  API Key: ${config.apiKey.substring(0, 10)}...${config.apiKey.substring(config.apiKey.length - 4)}`);
-      console.log(`  SSE URL: ${config.sseUrl}`);
+      console.log(`  API URL: ${config.apiUrl}`);
       console.log(`  Version: ${config.version}`);
       console.log(`  Installation ID: ${config.installationId}`);
       console.log(`  Created: ${config.createdAt}`);
@@ -102,7 +102,7 @@ export class Commands {
       console.log('====================');
       console.log('');
       console.log(`API Key: ${config.apiKey.substring(0, 10)}...`);
-      console.log(`SSE URL: ${config.sseUrl}`);
+      console.log(`API URL: ${config.apiUrl}`);
       console.log('');
 
       // Test API key validation
@@ -114,9 +114,9 @@ export class Commands {
         console.log(`   ❌ Invalid: ${validation.message}`);
       }
 
-      // Test SSE connection
-      console.log('2. Testing SSE connection...');
-      const connectionTest = await testConnection(config.apiKey, config.sseUrl);
+      // Test API connection
+      console.log('2. Testing API connection...');
+      const connectionTest = await testConnection(config.apiKey, config.apiUrl);
       if (connectionTest.valid) {
         console.log(`   ✅ Connected successfully`);
       } else {
@@ -156,7 +156,7 @@ export class Commands {
         const config = await this.configManager.load();
         console.log(`   ✅ Configuration file exists and is valid`);
         console.log(`      API Key: ${config.apiKey.substring(0, 10)}...`);
-        console.log(`      SSE URL: ${config.sseUrl}`);
+        console.log(`      API URL: ${config.apiUrl}`);
       } catch (error) {
         console.log(`   ❌ Configuration file is invalid: ${error instanceof Error ? error.message : String(error)}`);
         issuesFound++;
@@ -188,7 +188,7 @@ export class Commands {
     if (this.configManager.exists()) {
       try {
         const config = await this.configManager.load();
-        const connectionTest = await testConnection(config.apiKey, config.sseUrl);
+        const connectionTest = await testConnection(config.apiKey, config.apiUrl);
 
         if (connectionTest.valid) {
           console.log('   ✅ Connection to RemotoList server successful');
@@ -294,7 +294,7 @@ export class Commands {
       
       console.log('Current configuration:');
       console.log(`  API Key: ${currentConfig.apiKey.substring(0, 10)}...`);
-      console.log(`  SSE URL: ${currentConfig.sseUrl}`);
+      console.log(`  API URL: ${currentConfig.apiUrl}`);
       console.log('');
       
       console.log('Enter new values (press Enter to keep current):');

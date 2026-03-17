@@ -3,150 +3,124 @@ import { createInterface } from 'readline';
 import { trackEvent, TelemetryEvents } from './telemetry.js';
 
 interface BridgeConfig {
-  sseUrl: string;
+  apiUrl: string;
   apiKey: string;
   timeout?: number;
 }
 
 /**
- * SSE Bridge: Connects stdio (Claude) to RemotoList MCP Server
- * Reactively processes chunks like the Python bridge to avoid buffering.
+ * Streamable HTTP Bridge: Connects stdio (Claude) to RemotoList MCP Server
+ *
+ * Simple, stateless architecture:
+ * - Single POST /mcp/ endpoint for all JSON-RPC requests
+ * - Request-response pattern with direct HTTP POST
+ * - No sessions, no handshake, no coordination needed
+ * - Works seamlessly with multiple workers
  */
 export async function connectBridge(config: BridgeConfig): Promise<void> {
-  const { sseUrl, apiKey } = config;
+  const { apiUrl, apiKey } = config;
 
-  if (!sseUrl || !apiKey) {
-    throw new Error('SSE URL and API key are required');
+  if (!apiUrl || !apiKey) {
+    throw new Error('API URL and API key are required');
   }
 
-  const headers: Record<string, string> = {
-    'X-API-Key': apiKey,
-    'Accept': 'text/event-stream',
-  };
-
-  console.error('[RemotoList MCP] Connecting to SSE endpoint...');
-  console.error(`[RemotoList MCP] URL: ${sseUrl}`);
+  console.error('[RemotoList MCP] Starting bridge to MCP server');
+  console.error(`[RemotoList MCP] Server: ${apiUrl}`);
 
   try {
-    const response = await fetch(sseUrl, { headers });
+    const headers: Record<string, string> = {
+      'X-API-Key': apiKey,
+      'Content-Type': 'application/json',
+    };
 
-    if (!response.ok) {
-      const error = new Error(`Server returned ${response.status}: ${response.statusText}`);
-      await trackEvent(TelemetryEvents.BRIDGE_ERROR, {
-        status: response.status,
-        statusText: response.statusText,
-        sseUrl
-      });
-      throw error;
-    }
+    console.error('[RemotoList MCP] Connected and ready');
 
-    console.error('[RemotoList MCP] Connected to SSE stream');
-
-    let postUrl: string | null = null;
-    const decoder = new TextDecoder();
-    let buffer = '';
-
-    // 1. Handle STDIN (Claude -> Server)
+    // Handle stdin (Claude -> Server)
     const rl = createInterface({
       input: process.stdin,
       terminal: false,
     });
 
-      rl.on('line', (line) => {
-        void (async () => {
-          if (!line.trim()) return;
+    rl.on('line', (line) => {
+      void (async () => {
+        if (!line.trim()) return;
 
-          // Wait for handshake to complete
-          if (!postUrl) {
-            console.error('[RemotoList MCP] Waiting for endpoint URL before sending message...');
-            return;
+        try {
+          // Parse the JSON-RPC message from Claude
+          const message = JSON.parse(line);
+
+          // Track search events (anonymous)
+          if (message.method === 'tools/call' && message.params?.name === 'search_candidates') {
+            await trackEvent(TelemetryEvents.SEARCH, {
+              tool: 'search_candidates'
+              // Note: We don't track the actual query content
+            });
           }
+
+          // Send POST request to MCP server
+          console.error(`[RemotoList MCP] Sending ${message.method}...`);
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers,
+            body: line,
+          });
+
+          if (!response.ok) {
+            throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+          }
+
+          const responseData = await response.text();
+
+          // Only parse and send response if we got a body (not for notifications)
+          if (responseData && responseData.trim()) {
+            const responseJson = JSON.parse(responseData);
+            // Write response to stdout for Claude
+            console.error(`[RemotoList MCP] Response for ${message.method}: ${JSON.stringify(responseJson).substring(0, 100)}...`);
+            process.stdout.write(JSON.stringify(responseJson) + '\n');
+          } else {
+            // Notification received (204 No Content), no response to send
+            console.error(`[RemotoList MCP] Notification ${message.method} acknowledged`);
+          }
+
+        } catch (error) {
+          console.error(`[RemotoList MCP] Error processing message: ${error}`);
 
           try {
-            await fetch(postUrl, {
-              method: 'POST',
-              headers: {
-                ...headers,
-                'Content-Type': 'application/json',
-              },
-              body: line,
-            });
-            
-            // Track search events (anonymous)
-            try {
-              const message = JSON.parse(line);
-              if (message.method === 'tools/call' && message.params?.name === 'search_candidates') {
-                await trackEvent(TelemetryEvents.SEARCH, {
-                  tool: 'search_candidates'
-                  // Note: We don't track the actual query content
-                });
+            // Send error response to Claude
+            const parsedLine = JSON.parse(line);
+            const errorResponse = {
+              jsonrpc: '2.0',
+              id: parsedLine.id || null,
+              error: {
+                code: -32603,
+                message: String(error)
               }
-            } catch {
-              // Ignore parsing errors
-            }
-          } catch (error) {
-            console.error(`[RemotoList MCP] Error forwarding message to POST endpoint: ${error}`);
-          }
-        })();
-      });
-
-    // 2. Process SSE stream (Server -> Claude)
-    const stream = response.body as NodeJS.ReadableStream;
-
-    for await (const chunk of stream) {
-      const chunkBuffer = typeof chunk === 'string' ? Buffer.from(chunk) : chunk;
-      const decoded = decoder.decode(chunkBuffer, { stream: true });
-      buffer += decoded;
-
-      // Split on both \n\n and \r\n\r\n (handle both LF and CRLF)
-      const separator = buffer.includes('\r\n\r\n') ? '\r\n\r\n' : '\n\n';
-
-      while (buffer.includes(separator)) {
-        const [block, rest] = buffer.split(separator, 2);
-        buffer = rest;
-
-        // Parse SSE event block (event: type\ndata: content)
-        // Normalize line endings to just \n
-        const lines = block.replace(/\r\n/g, '\n').split('\n').filter(l => l.length > 0);
-
-        let eventType = '';
-        let eventData = '';
-
-        for (const line of lines) {
-          if (line.startsWith('event: ')) {
-            eventType = line.slice(7).trim();
-          } else if (line.startsWith('data: ')) {
-            eventData = line.slice(6).trim();
+            };
+            process.stdout.write(JSON.stringify(errorResponse) + '\n');
+          } catch {
+            // If we can't even parse the original message, just log it
+            console.error('[RemotoList MCP] Failed to send error response');
           }
         }
+      })();
+    });
 
-        // Handle different event types
-        if (eventType === 'endpoint' && eventData) {
-          // Handshake: server sends the POST endpoint path
-          if (!postUrl) {
-            postUrl = new URL(eventData, sseUrl).href;
-            console.error(`[RemotoList MCP] Handshake complete. Post URL: ${postUrl}`);
-          }
-        } else if (eventType === 'message' && eventData && postUrl) {
-          // Forward MCP JSON-RPC messages to Claude's stdout
-          process.stdout.write(eventData + '\n');
-        }
-      }
-    }
-
-    console.error('[RemotoList MCP] SSE stream closed by server');
-    process.exit(0);
+    // Handle graceful shutdown
+    rl.on('close', () => {
+      console.error('[RemotoList MCP] Stdin closed, shutting down');
+      process.exit(0);
+    });
 
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     console.error(`[RemotoList MCP] Fatal Error: ${message}`);
-    
+
     // Track error
     await trackEvent(TelemetryEvents.BRIDGE_ERROR, {
       error: message,
-      sseUrl
+      apiUrl
     });
-    
+
     process.exit(1);
   }
 }
