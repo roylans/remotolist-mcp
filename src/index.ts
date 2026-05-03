@@ -104,17 +104,26 @@ async function handleCommand(args: string[]): Promise<void> {
  */
 async function startBridgeOrSetup(): Promise<void> {
   const configManager = new ConfigManager();
-  
+
   try {
     // Try to load configuration
     const config = await configManager.load();
-    
+
     console.error(`[RemotoList MCP] v${VERSION}`);
     console.error(`[RemotoList MCP] Starting bridge to ${config.apiUrl}...`);
 
-    // Track bridge start
-    await trackEvent(TelemetryEvents.BRIDGE_START, {
+    // Debug: Log that we're about to start
+    if (process.env.DEBUG === '1') {
+      console.error(`[RemotoList MCP] DEBUG: Config loaded successfully`);
+      console.error(`[RemotoList MCP] DEBUG: apiUrl = ${config.apiUrl}`);
+      console.error(`[RemotoList MCP] DEBUG: apiKey = ${config.apiKey.substring(0, 20)}...`);
+    }
+
+    // Track bridge start (but don't wait for it)
+    trackEvent(TelemetryEvents.BRIDGE_START, {
       apiUrl: config.apiUrl
+    }).catch((err) => {
+      console.error(`[RemotoList MCP] Telemetry error (ignored): ${err}`);
     });
 
     // Start the bridge

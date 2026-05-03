@@ -48,9 +48,11 @@ export async function connectBridge(config: BridgeConfig): Promise<void> {
         try {
           // Parse the JSON-RPC message from Claude
           const message = JSON.parse(line);
+          const requestId = message.id || 'no-id';
+          const method = message.method || 'unknown';
 
           // Track search events (anonymous)
-          if (message.method === 'tools/call' && message.params?.name === 'search_candidates') {
+          if (method === 'tools/call' && message.params?.name === 'search_candidates') {
             await trackEvent(TelemetryEvents.SEARCH, {
               tool: 'search_candidates'
               // Note: We don't track the actual query content
@@ -58,15 +60,23 @@ export async function connectBridge(config: BridgeConfig): Promise<void> {
           }
 
           // Send POST request to MCP server
-          console.error(`[RemotoList MCP] Sending ${message.method}...`);
+          const startTime = Date.now();
+          console.error(`[RemotoList MCP] [${requestId}] → ${method}`);
+          if (process.env.DEBUG === '1') {
+            console.error(`[RemotoList MCP] [${requestId}] Request: ${JSON.stringify(message, null, 2)}`);
+          }
+
           const response = await fetch(apiUrl, {
             method: 'POST',
             headers,
             body: line,
           });
 
+          const duration = Date.now() - startTime;
+
           if (!response.ok) {
-            throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+            const errorBody = await response.text();
+            throw new Error(`Server returned ${response.status}: ${response.statusText}\nBody: ${errorBody}`);
           }
 
           const responseData = await response.text();
@@ -75,15 +85,19 @@ export async function connectBridge(config: BridgeConfig): Promise<void> {
           if (responseData && responseData.trim()) {
             const responseJson = JSON.parse(responseData);
             // Write response to stdout for Claude
-            console.error(`[RemotoList MCP] Response for ${message.method}: ${JSON.stringify(responseJson).substring(0, 100)}...`);
+            console.error(`[RemotoList MCP] [${requestId}] ← ${response.status} (${duration}ms)`);
+            if (process.env.DEBUG === '1') {
+              console.error(`[RemotoList MCP] [${requestId}] Response: ${JSON.stringify(responseJson, null, 2)}`);
+            }
             process.stdout.write(JSON.stringify(responseJson) + '\n');
           } else {
             // Notification received (204 No Content), no response to send
-            console.error(`[RemotoList MCP] Notification ${message.method} acknowledged`);
+            console.error(`[RemotoList MCP] [${requestId}] ✓ Notification acknowledged (${duration}ms)`);
           }
 
         } catch (error) {
-          console.error(`[RemotoList MCP] Error processing message: ${error}`);
+          const errorMsg = error instanceof Error ? error.message : String(error);
+          console.error(`[RemotoList MCP] ✗ Error: ${errorMsg}`);
 
           try {
             // Send error response to Claude
