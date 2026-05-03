@@ -116,6 +116,7 @@ logs
 # Test files
 __tests__/__snapshots__/
 test-client.js
+test-prod.js
 
 # Local development configuration
 .local-config.json
