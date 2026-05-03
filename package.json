@@ -1,6 +1,6 @@
 {
   "name": "remotolist-mcp",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "MCP client for RemotoList AI candidate search. Connect Claude Desktop to search candidates with natural language.",
   "author": {
     "name": "RemotoList",
